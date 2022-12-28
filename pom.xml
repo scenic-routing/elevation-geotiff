@@ -39,7 +39,13 @@
 
               <transformers>
                 <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                  <mainClass>me.callsen.taylor.osm2graph_neo4j.Main</mainClass>
+                  <manifestEntries>
+                    <Main-Class>me.callsen.taylor.elevationGeoTiff.Main</Main-Class>
+                    <!-- Required for GeoTiff / JAI support - https://johnewart.net/2012/geotools-maven-and-jai-oh-my/ -->
+                    <Implementation-Vendor>Taylor Callsen</Implementation-Vendor>
+                    <Implementation-Vendor-Id>me.callsen.taylor</Implementation-Vendor-Id>
+                    <Implementation-Version>0.0.1</Implementation-Version>
+                 </manifestEntries>
                 </transformer>
                 <!-- Required for neo4j embedded db support - https://stackoverflow.com/a/60874959 -->
                 <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>

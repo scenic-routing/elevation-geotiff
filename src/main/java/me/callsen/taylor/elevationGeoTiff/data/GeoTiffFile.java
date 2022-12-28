@@ -4,7 +4,6 @@ import java.awt.image.Raster;
 import java.io.File;
 import java.io.IOException;
 
-import org.codehaus.jettison.json.JSONObject;
 import org.geotools.coverage.grid.GridCoordinates2D;
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.grid.GridGeometry2D;
@@ -21,12 +20,14 @@ public class GeoTiffFile {
   private GridGeometry2D gridGeometry;
 
   public GeoTiffFile(String geotiffFilePath) throws IOException {
-    File tiffFile = new File("/development/workspace/USGS_13_n38w123_uncomp.tif");
+    File tiffFile = new File(geotiffFilePath);
     GeoTiffReader reader = new GeoTiffReader(tiffFile);
     GridCoverage2D cov = reader.read(null);
     gridGeometry = cov.getGridGeometry();
 
     tiffRaster = cov.getRenderedImage().getData();
+
+    System.out.println("GeoTiff file @ " + geotiffFilePath + " initialized");
   }
 
   public double getData(double longitude, double latitude) throws InvalidGridGeometryException, TransformException {
