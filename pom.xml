@@ -1,0 +1,120 @@
+<?xml version="1.0"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>me.callsen.taylor</groupId>
+  <artifactId>elevationGeoTiff</artifactId>
+  <version>0.0.1-SNAPSHOT</version>
+
+  <description>Java 11 project to load elevation data from a USGS The National Map GeoTiff file into a graph database.</description>
+
+  <packaging>jar</packaging>
+  <name>Elevation (GeoTiff) to Graph</name>
+  <url>http://maven.apache.org</url>
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <maven.compiler.target>11</maven.compiler.target>
+    <maven.compiler.source>11</maven.compiler.source>
+  </properties>
+  <build>
+    <plugins>
+
+      <!-- Bundle into single executable jar including dependencies -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-shade-plugin</artifactId>
+        <version>3.4.0</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>shade</goal>
+            </goals>
+            <configuration>
+
+              <!-- Remove -shaded from compiled jar name - https://stackoverflow.com/a/70792515 -->
+              <outputDirectory>${project.build.outputDirectory}</outputDirectory>
+              <finalName>${project.artifactId}-${project.version}</finalName>
+
+              <!-- Not required for this project (house keeping) -->
+              <createDependencyReducedPom>false</createDependencyReducedPom>
+
+              <transformers>
+                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                  <mainClass>me.callsen.taylor.osm2graph_neo4j.Main</mainClass>
+                </transformer>
+                <!-- Required for neo4j embedded db support - https://stackoverflow.com/a/60874959 -->
+                <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
+              </transformers>
+
+              <!-- Fixes manifest security errors "Invalid signature file digest for Manifest main attributes" - https://stackoverflow.com/a/55215382 -->
+              <filters>
+                <filter>
+                  <artifact>*:*</artifact>
+                  <excludes>
+                    <exclude>META-INF/MANIFEST.MF</exclude>
+                    <exclude>META-INF/*.SF</exclude>
+                    <exclude>META-INF/*.DSA</exclude>
+                    <exclude>META-INF/*.RSA</exclude>
+                  </excludes>
+                </filter>
+              </filters>
+
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
+    </plugins>
+  </build>
+  <dependencies>
+    
+    <!-- Neo4j -->
+    <dependency>
+      <groupId>org.neo4j</groupId>
+      <artifactId>neo4j</artifactId>
+      <version>4.4.11</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.neo4j.driver</groupId>
+      <artifactId>neo4j-java-driver</artifactId>
+      <version>4.4.9</version>
+    </dependency>
+
+    <!-- JSON Objects -->
+    <dependency>
+        <groupId>org.json</groupId>
+        <artifactId>json</artifactId>
+        <version>20220924</version>
+    </dependency>
+
+    <!-- GeoTools -->
+    <dependency>
+      <groupId>org.geotools</groupId>
+      <artifactId>gt-geometry</artifactId>
+      <version>22.2</version>
+    </dependency>
+    <dependency>
+      <groupId>org.geotools</groupId>
+      <artifactId>gt-geotiff</artifactId>
+      <version>22.2</version>
+    </dependency>
+    <dependency>
+      <groupId>org.geotools</groupId>
+      <artifactId>gt-epsg-hsql</artifactId>
+      <version>22.2</version>
+    </dependency>
+
+  </dependencies>
+
+  <repositories>
+    
+    <!-- Geo Processing -->
+    <repository>
+      <id>osgeo</id>
+      <name>Open Source Geospatial Foundation Repository</name>
+      <url>https://repo.osgeo.org/repository/release/</url>
+    </repository>
+
+  </repositories>
+
+</project>
