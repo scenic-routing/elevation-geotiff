@@ -2,7 +2,6 @@ package me.callsen.taylor.elevationGeoTiff.data;
 
 import static org.neo4j.configuration.GraphDatabaseSettings.DEFAULT_DATABASE_NAME;
 
-import java.math.BigDecimal;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -10,20 +9,14 @@ import java.util.Map;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
-import org.locationtech.jts.geom.Coordinate;
-import org.locationtech.jts.geom.LineString;
 import org.neo4j.dbms.api.DatabaseManagementService;
 import org.neo4j.dbms.api.DatabaseManagementServiceBuilder;
-import org.neo4j.graphdb.Result;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Label;
-import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
 import org.neo4j.graphdb.RelationshipType;
+import org.neo4j.graphdb.Result;
 import org.neo4j.graphdb.Transaction;
-import org.neo4j.values.storable.CoordinateReferenceSystem;
-import org.neo4j.values.storable.PointValue;
-import org.neo4j.values.storable.Values;
 
 public class GraphDb {
 
@@ -127,8 +120,11 @@ public class GraphDb {
     // add property to associatedData list
     addAssociatedDataProperty(relationship, propertyName);
 
+    JSONArray associatedDataArray = new JSONArray();
+    associatedDataArray.put(associatedData);
+
     // add JSON data to associated data property 
-    relationship.setProperty(propertyName, associatedData.toString());
+    relationship.setProperty(propertyName, associatedDataArray.toString());
   }
 
   public void setAssociatedData(Relationship relationship, String propertyName, JSONArray associatedData) {
