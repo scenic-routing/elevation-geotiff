@@ -62,17 +62,18 @@ public class Main {
       Relationship relationship = (Relationship)row.get("way");
 
       // retrieve geometry and query geotiff for elevation of points - support possibility of more than 2 points
+      //  NOTE: getData() calls can return null if out of tiff file range
       Point[] geomPoints = (Point[]) relationship.getProperty(GraphDb.GRAPH_GEOM_PROPERTY);
       Point startPoint = geomPoints[0];
-      double startElevation = geoTiffFile.getData(startPoint.getCoordinate().getCoordinate().get(0), startPoint.getCoordinate().getCoordinate().get(1));
+      Double startElevation = geoTiffFile.getData(startPoint.getCoordinate().getCoordinate().get(0), startPoint.getCoordinate().getCoordinate().get(1));
       Point endPoint = geomPoints[geomPoints.length-1];
-      double endElevation = geoTiffFile.getData(endPoint.getCoordinate().getCoordinate().get(0), endPoint.getCoordinate().getCoordinate().get(1));
+      Double endElevation = geoTiffFile.getData(endPoint.getCoordinate().getCoordinate().get(0), endPoint.getCoordinate().getCoordinate().get(1));
 
-      // assemble json data
+      // assemble json data where available
       JSONObject elevationData = new JSONObject();
-      elevationData.put("start", startElevation);
-      elevationData.put("end", endElevation);
-      elevationData.put("change", (endElevation - startElevation));
+      if (startElevation != null) elevationData.put("start", startElevation);
+      if (endElevation != null) elevationData.put("end", endElevation);
+      if (startElevation != null && endElevation != null)elevationData.put("change", (endElevation - startElevation));
 
       // set elevation to associated data in graph
       graphDb.setAssociatedData(relationship, GraphDb.GRAPH_ASSOCIATED_DATA_ELEVATION_PROPERTY, elevationData);
