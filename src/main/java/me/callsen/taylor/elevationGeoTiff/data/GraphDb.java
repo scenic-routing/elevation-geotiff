@@ -59,6 +59,10 @@ public class GraphDb {
     }
   }
 
+  public Transaction getTransaction() {
+    return db.beginTx();
+  }
+
   // overloaded for convienence
   public void commitSharedTransaction() {
     this.commitSharedTransaction(true);
@@ -137,11 +141,13 @@ public class GraphDb {
 
   private void addAssociatedDataProperty(Relationship relationship, String propertyName) {
     // add referenced associated data property to associatedData array (or create one of doesn't exist yet)
-    //  TODO: ensure duplicate entries can not be added (possibly using Set)
     String[] associatedDataArray;
     if (relationship.hasProperty(GRAPH_ASSOCIATED_DATA_PROPERTY)) {
       ArrayList<String> existingAssociatedDataList = new ArrayList<String>(Arrays.asList((String[]) relationship.getProperty(GRAPH_ASSOCIATED_DATA_PROPERTY)));
-      existingAssociatedDataList.add(propertyName);
+      // prevent duplicates - don't add property if already exists in the list
+      if (!existingAssociatedDataList.contains(propertyName)) {
+        existingAssociatedDataList.add(propertyName);
+      }
       associatedDataArray = existingAssociatedDataList.stream().toArray(String[]::new);
     } else {
       associatedDataArray = new String[1];
