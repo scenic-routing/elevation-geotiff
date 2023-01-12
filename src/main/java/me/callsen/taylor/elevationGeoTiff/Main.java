@@ -11,12 +11,13 @@ import org.neo4j.graphdb.spatial.Point;
 import org.opengis.referencing.operation.TransformException;
 
 import me.callsen.taylor.elevationGeoTiff.data.GeoTiffFile;
-import me.callsen.taylor.elevationGeoTiff.data.GraphDb;
+import me.callsen.taylor.scenicrouting.javasdk.data.GraphDb;
+import me.callsen.taylor.scenicrouting.javasdk.RoutingConstants;
 
 public class Main {
 
-  // TODO: move to shared
-  private static final int GRAPH_PAGINATION_AMOUNT = 5000;
+  public static final String GRAPH_ASSOCIATED_DATA_ELEVATION_PROPERTY = "ad_elevation";
+
   public static void main( String[] args ) throws Exception {
 
     // parameters
@@ -39,8 +40,8 @@ public class Main {
 
     // loop through all relationships in graph and assign elevation data
     long totalRelCount = graphDb.getRelationshipCount();
-    for (int pageNumber = 0; pageNumber * GRAPH_PAGINATION_AMOUNT < totalRelCount; ++pageNumber) {
-      System.out.println(String.format("Processing page %s, up to relationship %s", pageNumber, (pageNumber + 1) * GRAPH_PAGINATION_AMOUNT));
+    for (int pageNumber = 0; pageNumber * RoutingConstants.GRAPH_RELATIONSHIP_PAGINATION_AMOUNT < totalRelCount; ++pageNumber) {
+      System.out.println(String.format("Processing page %s, up to relationship %s", pageNumber, (pageNumber + 1) * RoutingConstants.GRAPH_RELATIONSHIP_PAGINATION_AMOUNT));
       processRelationshipPage(pageNumber, graphDb, geotiffFile);
     }
 
@@ -53,7 +54,7 @@ public class Main {
 
   public static void processRelationshipPage(int pageNumber, GraphDb graphDb, GeoTiffFile geoTiffFile) throws InvalidGridGeometryException, TransformException {
     
-    Transaction tx = graphDb.getSharedTransaction();
+    Transaction tx = graphDb.getTransaction();
     Result result = graphDb.getRelationshipPage(tx, pageNumber);
 
     // loop through relationships returned in page
@@ -63,7 +64,7 @@ public class Main {
 
       // retrieve geometry and query geotiff for elevation of points - support possibility of more than 2 points
       //  NOTE: getData() calls can return null if out of tiff file range
-      Point[] geomPoints = (Point[]) relationship.getProperty(GraphDb.GRAPH_GEOM_PROPERTY);
+      Point[] geomPoints = (Point[]) relationship.getProperty(RoutingConstants.GRAPH_GEOM_PROPERTY);
       Point startPoint = geomPoints[0];
       Double startElevation = geoTiffFile.getData(startPoint.getCoordinate().getCoordinate().get(0), startPoint.getCoordinate().getCoordinate().get(1));
       Point endPoint = geomPoints[geomPoints.length-1];
@@ -76,10 +77,11 @@ public class Main {
       if (startElevation != null && endElevation != null)elevationData.put("change", (endElevation - startElevation));
 
       // set elevation to associated data in graph
-      graphDb.setAssociatedData(relationship, GraphDb.GRAPH_ASSOCIATED_DATA_ELEVATION_PROPERTY, elevationData);
+      graphDb.setAssociatedData(relationship, GRAPH_ASSOCIATED_DATA_ELEVATION_PROPERTY, elevationData);
     }
 
-    graphDb.commitSharedTransaction();
+    tx.commit();
+    tx.close();
 
   }
 

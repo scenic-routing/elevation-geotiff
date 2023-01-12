@@ -1,4 +1,4 @@
-# Load GeoTiff Elvation Data to Graph
+# Load GeoTiff Elevation Data to Graph
 
 Module to load elevation data from a USGS GeoTiff file into a Graph database. Works by querying all relationships in the Graph, iterating over each, and looking up elevation in the GeoTiff (based on relationship lat/long GPS coordinates stored in the `geom` property). This module is designed to be run on Graph data loaded by the [osm2graph-neo4j](https://github.com/scenic-routing/osm2graph-neo4j) module.
 
@@ -27,7 +27,7 @@ The Graph database is expected to have an array of Neo4j Spatial `Point` datatyp
 Tests can be executed with the following command:
 
 ```
-mvn verify
+mvn test
 ```
 
 # Thank you
