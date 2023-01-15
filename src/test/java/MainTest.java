@@ -63,7 +63,7 @@ public class MainTest {
       assertEquals(278713838, rel.getProperty("osm_id"));
       
       // associatedData
-      assertEquals(Main.GRAPH_ASSOCIATED_DATA_ELEVATION_PROPERTY, ((String[])rel.getProperty(RoutingConstants.GRAPH_ASSOCIATED_DATA_PROPERTY))[0]);
+      assertEquals(Main.GRAPH_ASSOCIATED_DATA_ELEVATION_PROPERTY, ((String[])rel.getProperty(RoutingConstants.GRAPH_PROPERTY_NAME_ASSOCIATED_DATA))[0]);
       
       // ad_elevation
       JSONArray elevationDataArray = new JSONArray((String)rel.getProperty(Main.GRAPH_ASSOCIATED_DATA_ELEVATION_PROPERTY));

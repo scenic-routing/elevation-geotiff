@@ -64,7 +64,7 @@ public class Main {
 
       // retrieve geometry and query geotiff for elevation of points - support possibility of more than 2 points
       //  NOTE: getData() calls can return null if out of tiff file range
-      Point[] geomPoints = (Point[]) relationship.getProperty(RoutingConstants.GRAPH_GEOM_PROPERTY);
+      Point[] geomPoints = (Point[]) relationship.getProperty(RoutingConstants.GRAPH_PROPERTY_NAME_GEOM);
       Point startPoint = geomPoints[0];
       Double startElevation = geoTiffFile.getData(startPoint.getCoordinate().getCoordinate().get(0), startPoint.getCoordinate().getCoordinate().get(1));
       Point endPoint = geomPoints[geomPoints.length-1];
